@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 from six.moves import cPickle as pickle
 import numpy as np
@@ -118,7 +118,7 @@ def load_tiny_imagenet(path, dtype=np.float32, subtract_mean=True):
     # Use words.txt to get names for each class
     with open(os.path.join(path, 'words.txt'), 'r') as f:
         wnid_to_words = dict(line.split('\t') for line in f)
-        for wnid, words in wnid_to_words.iteritems():
+        for wnid, words in wnid_to_words.items():
             wnid_to_words[wnid] = [w.strip() for w in words.split(',')]
     class_names = [wnid_to_words[wnid] for wnid in wnids]
 

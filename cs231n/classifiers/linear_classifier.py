@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 import numpy as np
 from cs231n.classifiers.linear_svm import *
@@ -39,7 +39,7 @@ class LinearClassifier(object):
 
         # Run stochastic gradient descent to optimize W
         loss_history = []
-        for it in xrange(num_iters):
+        for it in range(num_iters):
             X_batch = None
             y_batch = None
 
