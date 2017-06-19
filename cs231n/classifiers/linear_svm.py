@@ -81,15 +81,16 @@ def svm_loss_vectorized(W, X, y, reg):
     number_classes = W.shape[1]
     number_train = X.shape[0]
     number_dim = X.shape[1]
-    S = np.dot(X,W)
-    select_label = S[np.arange(number_train),y]
-    select_label = select_label.reshape((number_train,1))
-
-    margins = S - select_label + 1
-    margins_max =np.maximum(margins,0)
-    margins_max[np.arange(number_train),y] = 0
     
     # Loss 
+    S = np.dot(X, W)
+    select_label = S[np.arange(number_train), y]
+    select_label = select_label.reshape((number_train, 1))
+
+    margins = S - select_label + 1
+    margins_max = np.maximum(margins, 0)
+    margins_max[np.arange(number_train), y] = 0
+    
     L = np.sum(margins_max)/number_train
     loss = L + reg * np.sum(W * W)
 
@@ -99,16 +100,12 @@ def svm_loss_vectorized(W, X, y, reg):
     ds_true = np.sum(label_positive, axis=1)
     ds_true *= -1
     
-
     ds = np.ones_like(S)
-    
     ds[margins < 0] = 0
-    
-    ds[np.arange(number_train),y] = ds_true 
-    
+    ds[np.arange(number_train), y] = ds_true 
     ds /= number_train
     
-    dW = np.dot(X.T,ds) + 2 * reg * W
+    dW = np.dot(X.T, ds) + 2 * reg * W
     
 
  
