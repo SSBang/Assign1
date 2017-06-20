@@ -31,7 +31,34 @@ def softmax_loss_naive(W, X, y, reg):
     # here, it is easy to run into numeric instability. Don't forget the        #
     # regularization!                                                           #
     ##########################################################################
-    pass
+    num_train = X.shape[0]
+    num_labels = W.shape[1]
+
+    S = np.dot(X, W)
+    
+    for i in range(num_train):
+        sum_ith_score = np.sum(np.exp(S[i]))
+        true_score = np.exp(S[i, y[i]])
+        loss += -np.log(true_score / sum_ith_score)
+    
+    loss /= num_train
+    loss += reg * np.sum(W * W)        
+    
+
+    exp_S = np.exp(S)
+    
+    rowsum_exp_S = np.sum(exp_S, axis=1)
+
+    rowsum_exp_S_reshape = rowsum_exp_S.reshape((X.shape[0], 1))
+    dS = exp_S / rowsum_exp_S_reshape
+
+    labeled_S = np.zeros_like(S)
+    labeled_S[np.arange(X.shape[0]),y] = -1
+
+    dS += labeled_S
+    dS /= num_train
+
+    dW = np.dot(X.T, dS) + 2*reg*W
     ##########################################################################
     #                          END OF YOUR CODE                                 #
     ##########################################################################
@@ -55,7 +82,36 @@ def softmax_loss_vectorized(W, X, y, reg):
     # here, it is easy to run into numeric instability. Don't forget the        #
     # regularization!                                                           #
     ##########################################################################
-    pass
+    num_train = X.shape[0]
+    num_labels = W.shape[1]
+
+    S = np.dot(X, W)
+    exp_S = np.exp(S)
+    rowsum_exp_S = np.sum(exp_S, axis=1)
+    true_labed_exp_S = exp_S[np.arange(num_train),y]
+    margin = -np.log(true_labed_exp_S / rowsum_exp_S)
+    loss = np.sum(margin)
+
+    loss /= num_train
+    loss += reg * np.sum(W * W)        
+    
+
+    
+    #dW
+    
+    
+    
+
+    rowsum_exp_S_reshape = rowsum_exp_S.reshape((X.shape[0], 1))
+    dS = exp_S / rowsum_exp_S_reshape
+
+    labeled_S = np.zeros_like(S)
+    labeled_S[np.arange(X.shape[0]),y] = -1
+
+    dS += labeled_S
+    dS /= num_train
+
+    dW = np.dot(X.T, dS) + 2*reg*W
     ##########################################################################
     #                          END OF YOUR CODE                                 #
     ##########################################################################
