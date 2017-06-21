@@ -86,7 +86,8 @@ def softmax_loss_vectorized(W, X, y, reg):
     num_labels = W.shape[1]
 
     S = np.dot(X, W)
-    exp_S = np.exp(S)
+    max_S = np.amax(S)
+    exp_S = np.exp(S - max_S)  ### 책에서 말한 inf 제거 방법
     rowsum_exp_S = np.sum(exp_S, axis=1)
     true_labed_exp_S = exp_S[np.arange(num_train),y]
     margin = -np.log(true_labed_exp_S / rowsum_exp_S)
@@ -98,9 +99,6 @@ def softmax_loss_vectorized(W, X, y, reg):
 
     
     #dW
-    
-    
-    
 
     rowsum_exp_S_reshape = rowsum_exp_S.reshape((X.shape[0], 1))
     dS = exp_S / rowsum_exp_S_reshape
