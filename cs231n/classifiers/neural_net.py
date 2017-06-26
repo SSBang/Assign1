@@ -77,10 +77,10 @@ class TwoLayerNet(object):
         # Store the result in the scores variable, which should be an array of      #
         # shape (N, C).                                                             #
         #######################################################################
-        Layer_1 = np.dot(X, W1) + b1
-        Layer_1_lelu = np.maximum(Layer_1, 0)
-        scores = np.dot(Layer_1_lelu, W2) + b2
-
+        layer_1 = np.dot(X, W1) + b1
+        layer_1_relu = np.maximum(layer_1, 0)
+        scores = np.dot(layer_1_relu, W2) + b2
+        scores = scores - scores.max()
         #######################################################################
         #                              END OF YOUR CODE                             #
         #######################################################################
@@ -121,14 +121,14 @@ class TwoLayerNet(object):
         dscores[np.arange(N), y] -= 1
         dscores /= N
 
-        dW2 = np.dot(Layer_1_lelu.T, dscores) + 2 * reg * W2
+        dW2 = np.dot(layer_1_relu.T, dscores) + 2 * reg * W2
         db2 = np.sum(dscores, axis = 0)
         
-        dLayer_1 = np.dot(dscores, W2.T)
-        dLayer_1[Layer_1 < 0] = 0 
+        dlayer_1 = np.dot(dscores, W2.T)
+        dlayer_1[layer_1 < 0] = 0 
     
-        dW1 = np.dot(X.T, dLayer_1) + 2 * reg * W1
-        db1 = np.sum(dLayer_1, axis = 0)
+        dW1 = np.dot(X.T, dlayer_1) + 2 * reg * W1
+        db1 = np.sum(dlayer_1, axis = 0)
 
         #assert 0, print(dW1, dW2, db1, db2)
         grads['W1'] = dW1
