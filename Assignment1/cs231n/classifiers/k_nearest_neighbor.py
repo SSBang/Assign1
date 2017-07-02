@@ -67,7 +67,7 @@ class KNearestNeighbor(object):
         dists = np.zeros((num_test, num_train))
         for i in range(num_test):
             for j in range(num_train):
-                dists[i,j] = np.sum((self.X_train[j,:] - X[i,:])**2)
+                dists[i, j] = np.sum((self.X_train[j, :] - X[i, :])**2)
         return np.sqrt(dists)
 
     def compute_distances_one_loop(self, X):
@@ -82,7 +82,7 @@ class KNearestNeighbor(object):
         dists = np.zeros((num_test, num_train))
 
         for i in range(num_test):
-            dists[i,:] = np.sum((X[i,:]-self.X_train)**2, axis=1)
+            dists[i, :] = np.sum((X[i, :] - self.X_train)**2, axis=1)
         return np.sqrt(dists)
 
     def compute_distances_no_loops(self, X):
@@ -96,17 +96,16 @@ class KNearestNeighbor(object):
         num_train = self.X_train.shape[0]
         dists = np.zeros((num_test, num_train))
 
-        dot_mat =np.dot(self.X_train,X.T)
+        dot_mat = np.dot(self.X_train, X.T)
         dot_mat *= -2
 
-        train_sum = np.sum(self.X_train**2,axis=1)
-        test_sum = np.sum(X**2,axis=1)
+        train_sum = np.sum(self.X_train**2, axis=1)
+        test_sum = np.sum(X**2, axis=1)
 
         dot_mat += test_sum
 
         dot_mat = dot_mat.T + train_sum
-        dists =np.sqrt(dot_mat) 
-
+        dists = np.sqrt(dot_mat)
 
         return dists
 
@@ -136,8 +135,8 @@ class KNearestNeighbor(object):
             # neighbors. Store these labels in closest_y.                           #
             # Hint: Look up the function numpy.argsort.                             #
             ###################################################################
-            
-            closest_y = self.y_train[np.argsort(dists[i,])[:k]] 
+
+            closest_y = self.y_train[np.argsort(dists[i, ])[:k]]
             ###################################################################
             # TODO:                                                                 #
             # Now that you have found the labels of the k nearest neighbors, you    #
@@ -146,10 +145,11 @@ class KNearestNeighbor(object):
             # label.                                                                #
             ###################################################################
             count_vote = np.bincount(closest_y)
-            label = np.array([x for x in range(len(count_vote)) if max(count_vote)==count_vote[x] ])
+            label = np.array([x for x in range(len(count_vote))
+                              if max(count_vote) == count_vote[x]])
             #index = np.array([x for x in range(k) if max(closest_y)==closest_y[x] ])
-            
-            if len(label)==1:
+
+            if len(label) == 1:
                 y_pred[i] = label
             else:
                 #y_pred[i] = closest_y[int(index[0])]
@@ -159,8 +159,3 @@ class KNearestNeighbor(object):
             ###################################################################
 
         return y_pred
-
-
-
-
-

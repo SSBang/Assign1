@@ -100,7 +100,7 @@ class TwoLayerNet(object):
         score_exp = np.exp(scores)
         score_exp_sum = np.sum(score_exp, axis=1)
         score_true = score_exp[np.arange(N), y]
-        
+
         margin = -np.log(score_true / score_exp_sum)
         loss = np.mean(margin)
 
@@ -117,18 +117,18 @@ class TwoLayerNet(object):
         # grads['W1'] should store the gradient on W1, and be a matrix of same size #
         #######################################################################
         dscores = score_exp
-        dscores /= score_exp_sum.reshape((N,1))
+        dscores /= score_exp_sum.reshape((N, 1))
         dscores[np.arange(N), y] -= 1
         dscores /= N
 
         dW2 = np.dot(layer_1_relu.T, dscores) + 2 * reg * W2
-        db2 = np.sum(dscores, axis = 0)
-        
+        db2 = np.sum(dscores, axis=0)
+
         dlayer_1 = np.dot(dscores, W2.T)
-        dlayer_1[layer_1 < 0] = 0 
-    
+        dlayer_1[layer_1 < 0] = 0
+
         dW1 = np.dot(X.T, dlayer_1) + 2 * reg * W1
-        db1 = np.sum(dlayer_1, axis = 0)
+        db1 = np.sum(dlayer_1, axis=0)
 
         #assert 0, print(dW1, dW2, db1, db2)
         grads['W1'] = dW1
@@ -179,10 +179,11 @@ class TwoLayerNet(object):
             # them in X_batch and y_batch respectively.                             #
             ###################################################################
             index_list = np.arange(num_train)
-            batch_index = np.random.choice(index_list, size = batch_size, replace=True)
+            batch_index = np.random.choice(
+                index_list, size=batch_size, replace=True)
             X_batch = X[batch_index, :]
             y_batch = y[batch_index]
-            
+
             ###################################################################
             #                             END OF YOUR CODE                          #
             ###################################################################
@@ -197,11 +198,11 @@ class TwoLayerNet(object):
             # using stochastic gradient descent. You'll need to use the gradients   #
             # stored in the grads dictionary defined above.                         #
             ###################################################################
-            
-            self.params['W1'] = self.params['W1'] - learning_rate * grads['W1'] 
-            self.params['W2'] = self.params['W2'] - learning_rate * grads['W2'] 
-            self.params['b1'] = self.params['b1'] - learning_rate * grads['b1'] 
-            self.params['b2'] = self.params['b2'] - learning_rate * grads['b2']  
+
+            self.params['W1'] = self.params['W1'] - learning_rate * grads['W1']
+            self.params['W2'] = self.params['W2'] - learning_rate * grads['W2']
+            self.params['b1'] = self.params['b1'] - learning_rate * grads['b1']
+            self.params['b2'] = self.params['b2'] - learning_rate * grads['b2']
 
             ###################################################################
             #                             END OF YOUR CODE                          #
@@ -248,8 +249,9 @@ class TwoLayerNet(object):
         #######################################################################
         # TODO: Implement this function; it should be VERY simple!                #
         #######################################################################
-        L1 = np.maximum(np.dot(X, self.params['W1']) + self.params['b1'] , 0)
-        y_pred = np.argmax(np.dot(L1, self.params['W2']) + self.params['b2'], axis = 1)
+        L1 = np.maximum(np.dot(X, self.params['W1']) + self.params['b1'], 0)
+        y_pred = np.argmax(
+            np.dot(L1, self.params['W2']) + self.params['b2'], axis=1)
         #######################################################################
         #                              END OF YOUR CODE                           #
         #######################################################################
