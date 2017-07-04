@@ -38,7 +38,7 @@ class ThreeLayerConvNet(object):
         self.reg = reg
         self.dtype = dtype
 
-        ############################################################################
+        #######################################################################
         # TODO: Initialize weights and biases for the three-layer convolutional    #
         # network. Weights should be initialized from a Gaussian with standard     #
         # deviation equal to weight_scale; biases should be initialized to zero.   #
@@ -47,15 +47,14 @@ class ThreeLayerConvNet(object):
         # and 'b1'; use keys 'W2' and 'b2' for the weights and biases of the       #
         # hidden affine layer, and keys 'W3' and 'b3' for the weights and biases   #
         # of the output affine layer.                                              #
-        ############################################################################
+        #######################################################################
         pass
-        ############################################################################
+        #######################################################################
         #                             END OF YOUR CODE                             #
-        ############################################################################
+        #######################################################################
 
         for k, v in self.params.items():
             self.params[k] = v.astype(dtype)
-
 
     def loss(self, X, y=None):
         """
@@ -75,29 +74,29 @@ class ThreeLayerConvNet(object):
         pool_param = {'pool_height': 2, 'pool_width': 2, 'stride': 2}
 
         scores = None
-        ############################################################################
+        #######################################################################
         # TODO: Implement the forward pass for the three-layer convolutional net,  #
         # computing the class scores for X and storing them in the scores          #
         # variable.                                                                #
-        ############################################################################
+        #######################################################################
         pass
-        ############################################################################
+        #######################################################################
         #                             END OF YOUR CODE                             #
-        ############################################################################
+        #######################################################################
 
         if y is None:
             return scores
 
         loss, grads = 0, {}
-        ############################################################################
+        #######################################################################
         # TODO: Implement the backward pass for the three-layer convolutional net, #
         # storing the loss and gradients in the loss and grads variables. Compute  #
         # data loss using softmax, and make sure that grads[k] holds the gradients #
         # for self.params[k]. Don't forget to add L2 regularization!               #
-        ############################################################################
+        #######################################################################
         pass
-        ############################################################################
+        #######################################################################
         #                             END OF YOUR CODE                             #
-        ############################################################################
+        #######################################################################
 
         return loss, grads
