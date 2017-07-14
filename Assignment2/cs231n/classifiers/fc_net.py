@@ -188,15 +188,15 @@ class FullyConnectedNet(object):
         #######################################################################
         
         for iter_num in range(len(hidden_dims)):
-            self.params['W' + str(iter_num + 1)] = np.random.normal(0, weight_scale, (hidden_dims[iter_num - 1], hidden_dims[iter_num]))
-            self.params['b' + str(iter_num + 1)] = np.zeros(hidden_dims[iter_num])
+            self.params['W{}'.format(iter_num + 1)] = np.random.normal(0, weight_scale, (hidden_dims[iter_num - 1], hidden_dims[iter_num]))
+            self.params['b{}'.format(iter_num + 1)] = np.zeros(hidden_dims[iter_num])
             if (self.use_batchnorm):
                 self.params['gamma'+ str(iter_num + 1)] = np.array([1])            
                 self.params['beta'+ str(iter_num + 1)] = np.array([0])
         
         self.params['W1'] = np.random.normal(0, weight_scale, (input_dim, hidden_dims[0]))
-        self.params['W' + str(self.num_layers)] = np.random.normal(0, weight_scale, (hidden_dims[-1], num_classes))
-        self.params['b' + str(self.num_layers)] = np.zeros(num_classes)
+        self.params['W{}'.format(self.num_layers)] = np.random.normal(0, weight_scale, (hidden_dims[-1], num_classes))
+        self.params['b{}'.format(self.num_layers)] = np.zeros(num_classes)
         #######################################################################
         #                             END OF YOUR CODE                             #
         #######################################################################
@@ -254,30 +254,33 @@ class FullyConnectedNet(object):
         # self.bn_params[1] to the forward pass for the second batch normalization #
         # layer, etc.                                                              #
         #######################################################################
-        hidden_dict = {}
+        
         cache_dict = {}
         num_layers = self.num_layers
-        for iter_layer in range(1, num_layers):
-
+        first_layer = 1
+        last_layer = num_layers
+        
+        for iter_layer in range(1, (num_layers+1)):
+            Wi = self.params['W{}'.format(iter_layer)]
+            bi = self.params['b{}'.format(iter_layer)]
+            
             ## affine
-            if iter_layer == 1:
-                hidden_dict['H1'], cache_dict['cache1'] = affine_forward(X, self.params['W1'], self.params['b1'])
+            if iter_layer == first_layer:
+                hidden, cache_dict['cache{}'.format(iter_layer)] = affine_forward(X, Wi, bi)
+            elif iter_layer != last_layer:
+                hidden, cache_dict['cache{}'.format(iter_layer)] = affine_forward(hidden, Wi, bi) 
             else:
-                hidden_dict['H' + str(iter_layer)] , cache_dict['cache' + str(iter_layer)] = affine_forward(hidden_dict['H' + str(iter_layer - 1)], self.params['W' + str(iter_layer)], self.params['b' + str(iter_layer)]  ) 
-            ## affine
-
+                hidden, cache_dict['cache{}'.format(iter_layer)] = affine_forward(hidden, Wi, bi)
+                scores = hidden
+                break
             ## batch
-            ## batch
-
+            
             ##relu
-            hidden_dict['H' + str(iter_layer)], cache_dict['cache_relu'+ str(iter_layer)] = relu_forward(hidden_dict['H' + str(iter_layer)])
-            ##relu
-
+            hidden, cache_dict['cache_relu{}'.format(iter_layer)] = relu_forward(hidden)
+            
             ##dropout
-            ##dropout
+            
 
-        hidden_dict['H' + str(num_layers)], cache_dict['cache' + str(num_layers)] = affine_forward(hidden_dict['H' + str(num_layers-1)], self.params['W' + str(num_layers)], self.params['b' + str(num_layers)])
-        scores = hidden_dict['H' + str(num_layers)]
         #######################################################################
         #                             END OF YOUR CODE                             #
         #######################################################################
@@ -305,28 +308,31 @@ class FullyConnectedNet(object):
         loss, dscores = softmax_loss(scores, y) 
         l2_value = 0
         for w_index in range(1, (num_layers + 1)):
-            l2_value += np.sum(self.params['W' + str(w_index)]**2)
+            l2_value += np.sum(self.params['W{}'.format(w_index)]**2)
 
         loss += 0.5 * reg * l2_value
         
 
-        dhidden, grads['W'+str(num_layers)], grads['b' + str(num_layers)] = affine_backward(dscores, cache_dict['cache' + str(num_layers)])
-        
-        grads['W'+str(num_layers)] += reg * self.params['W' + str(num_layers)]
+        for iter_layer in range(num_layers, 0, -1):
+            wi = 'W{}'.format(iter_layer)
+            bi = 'b{}'.format(iter_layer)
+            
+            if iter_layer == num_layers:
+                dhidden, grads[wi], grads[bi] = affine_backward(dscores, cache_dict['cache{}'.format(iter_layer)])
+                grads[wi] += reg * self.params[wi]
+            else:
+                ## dropout
 
-        for iter_layer in range((num_layers-1), 0, -1):
-            ## dropout
+                ## relu
+                dhidden = relu_backward(dhidden, cache_dict['cache_relu{}'.format(iter_layer)])
 
-            ## relu
-            dhidden = relu_backward(dhidden, cache_dict['cache_relu' + str(iter_layer)])
+                ## batch
 
-            ## batch
+                ## affine
+                dhidden, grads[wi], grads[bi] = affine_backward(dhidden, cache_dict['cache{}'.format(iter_layer)])
 
-            ## affine
-            dhidden, grads['W' + str(iter_layer)],grads['b' + str(iter_layer)] = affine_backward(dhidden, cache_dict['cache' + str(iter_layer)])
-
-            ## reg
-            grads['W'+str(iter_layer)] += reg * self.params['W' + str(iter_layer)]
+                ## reg
+                grads[wi] += reg * self.params[wi]
 
         #######################################################################
         #                             END OF YOUR CODE                             #
