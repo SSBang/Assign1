@@ -290,6 +290,9 @@ class FullyConnectedNet(object):
                 hidden, cache_dict['cache_relu{}'.format(iter_layer)] = relu_forward(hidden)
                 
                 ##dropout
+                if self.use_dropout:
+                                    
+                    hidden, cache_dict['cache_drop{}'.format(iter_layer)] = dropout_forward(hidden, self.dropout_param)
 
             else:
                 scores, cache_dict['cache{}'.format(iter_layer)] = affine_forward(hidden, Wi, bi)
@@ -342,7 +345,10 @@ class FullyConnectedNet(object):
             else:
 
                 ## dropout
+                if self.use_dropout:
+                    dhidden = dropout_backward(dhidden, cache_dict['cache_drop{}'.format(iter_layer)])
 
+                
                 ## relu
 
                 dhidden = relu_backward(dhidden, cache_dict['cache_relu{}'.format(iter_layer)])
