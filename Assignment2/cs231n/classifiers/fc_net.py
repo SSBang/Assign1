@@ -85,6 +85,7 @@ class TwoLayerNet(object):
         b2 = self.params['b2']
         
         hidden_score, cache1 = affine_forward(X, W1, b1)
+        hidden_score, cache_relu = relu_forward(hidden_score)
         scores, cache2 = affine_forward(hidden_score, W2, b2)
         #######################################################################
         #                             END OF YOUR CODE                             #
@@ -111,6 +112,7 @@ class TwoLayerNet(object):
         loss += 0.5 * reg * (np.sum(W1 * W1) + np.sum(W2 * W2))
         
         dhidden, dW2, db2 = affine_backward(dscores, cache2)
+        dhidden = relu_backward(dhidden,cache_relu)
         dx, dW1, db1 = affine_backward(dhidden, cache1)
 
         dW1 += reg * W1

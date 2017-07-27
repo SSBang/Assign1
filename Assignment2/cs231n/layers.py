@@ -413,7 +413,31 @@ def conv_forward_naive(x, w, b, conv_param):
     # TODO: Implement the convolutional forward pass.                         #
     # Hint: you can use the function np.pad for padding.                      #
     ###########################################################################
-    pass
+    p = conv_param["pad"]
+    s = conv_param["stride"]
+    N, C, H, W = x.shape
+    F, C, HH, WW = w.shape
+    new_H = int(1 + (H + 2 * p - HH) / s)
+    new_W = int(1 + (W + 2 * p - WW) / s)
+    
+    out = np.zeros((N, F, new_H, new_W))
+    out = out.reshape((N*F, new_H, new_W))
+
+    x_padding = np.pad(x, ((0,0), (0,0), (p,p), (p,p)), 'constant')
+    
+    N, C, H, W = x_padding.shape
+
+    f_trans = w.reshape((F,-1)).T
+    
+    for h_index in range(new_H):
+        for w_index in range(new_W):
+            x_selected = x_padding[:, :, s * h_index : (s * h_index + HH) , s * w_index : (s * w_index + WW)]
+            ans, _= affine_forward(x_selected, f_trans, b)
+            
+            out[range(N*F), [h_index]*(N*F), [w_index]*(N*F)] = ans.flatten()
+
+
+    out = out.reshape((N, F, new_H, new_W))
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
