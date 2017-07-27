@@ -59,7 +59,7 @@ def affine_backward(dout, cache):
     x_shape = x.shape[1:]
     flatted_x = x.reshape(N, -1)  # shape (N, D)
 
-    # (N, M) (M, D) > reshpe > (N,d1,...,d_k)
+    # (N, M) (M, D) > reshape > (N,d1,...,d_k)
     dx = np.dot(dout, w.T).reshape((N, *x_shape))
     dw = np.dot(flatted_x.T, dout)  # (D, N) (N, M)
     db = np.sum(dout, axis=0)  # (M,)
@@ -462,10 +462,41 @@ def conv_backward_naive(dout, cache):
     ###########################################################################
     # TODO: Implement the convolutional backward pass.                        #
     ###########################################################################
-    pass
+    x, w, b, conv_param = cache
+    N, C, H, W = x.shape
+    F, C, HH, WW = w.shape
+    p = conv_param["pad"]
+    s = conv_param["stride"]
+    new_H = int(1 + (H + 2 * p - HH) / s)
+    new_W = int(1 + (W + 2 * p - WW) / s)
+    
+    x_padding = np.pad(x, ((0,0), (0,0), (p,p), (p,p)), 'constant')
+    
+    N, C, H, W = x_padding.shape
+
+    f_trans = w.reshape((F,-1)).T
+    
+    dout = dout.reshape((N*F, new_H, new_W))
+    dx = np.zeros_like(x_padding)
+    dw = np.zeros_like(w)
+    db = np.zeros_like(b)
+
+    for h_index in range(new_H):
+        for w_index in range(new_W):
+            x_selected = x_padding[:, :, s * h_index : (s * h_index + HH) , s * w_index : (s * w_index + WW)]
+            
+            cache_loop = (x_selected, f_trans, b)
+            
+            dout_trans = dout[range(N*F), [h_index]*(N*F), [w_index]*(N*F)].reshape((N,-1))
+            dx_temp, dw_temp, db_temp = affine_backward(dout_trans, cache_loop)
+            
+            dx[:, :, s * h_index : (s * h_index + HH) , s * w_index : (s * w_index + WW)] += dx_temp.reshape(N, C, HH, WW)
+            dw += dw_temp.T.reshape(F, C, HH, WW)
+            db += db_temp
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
+    dx = dx[:,:, s:(H-s) , s:(W-s)]
     return dx, dw, db
 
 
