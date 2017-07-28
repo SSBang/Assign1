@@ -519,7 +519,26 @@ def max_pool_forward_naive(x, pool_param):
     ###########################################################################
     # TODO: Implement the max pooling forward pass                            #
     ###########################################################################
-    pass
+    pool_h = pool_param["pool_height"]
+    pool_w = pool_param["pool_width"]
+    s = pool_param["stride"]
+    N, C, H, W = x.shape
+    
+    new_H = int(1 + (H - pool_h) / s)
+    new_W = int(1 + (W - pool_w) / s)
+    
+    out = np.zeros((N, C, new_H, new_W))
+    out = out.reshape((N*C, new_H, new_W))
+    
+    for h_index in range(new_H):
+        for w_index in range(new_W):
+            x_selected = x[:, :, s * h_index : (s * h_index + pool_h) , s * w_index : (s * w_index + pool_w)]
+            ans = np.amax(x_selected, axis = (2,3))
+
+            out[range(N*C), [h_index]*(N*C), [w_index]*(N*C)] = ans.flatten()
+
+
+    out = out.reshape((N, C, new_H, new_W))
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
@@ -542,7 +561,28 @@ def max_pool_backward_naive(dout, cache):
     ###########################################################################
     # TODO: Implement the max pooling backward pass                           #
     ###########################################################################
-    pass
+    x, pool_param = cache
+    pool_h = pool_param["pool_height"]
+    pool_w = pool_param["pool_width"]
+    s = pool_param["stride"]
+    N, C, H, W = x.shape
+    N, C, new_H, new_W = dout.shape
+
+    dx = np.ones_like(x)
+
+    for h_index in range(new_H):
+        for w_index in range(new_W):
+            
+            x_selected = x[:, :, s * h_index : (s * h_index + pool_h) , s * w_index : (s * w_index + pool_w)]
+
+            mask = (x_selected == np.amax(x_selected, axis = (2,3)).reshape((N,C,1,1)))
+            dx_printing = np.broadcast_to(dout[:, :, h_index, w_index].reshape(N,C,1,1), (N,C,pool_h,pool_w))
+
+            dx[:, :, s * h_index : (s * h_index + pool_h) , s * w_index : (s * w_index + pool_w)] = dx_printing * mask
+            
+             
+
+
     ###########################################################################
     #                             END OF YOUR CODE                            #
     ###########################################################################
