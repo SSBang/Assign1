@@ -80,7 +80,7 @@ class TwoLayerNet(object):
         layer_1 = np.dot(X, W1) + b1
         layer_1_relu = np.maximum(layer_1, 0)
         scores = np.dot(layer_1_relu, W2) + b2
-        scores = scores - scores.max()
+        
         #######################################################################
         #                              END OF YOUR CODE                             #
         #######################################################################
@@ -97,6 +97,8 @@ class TwoLayerNet(object):
         # in the variable loss, which should be a scalar. Use the Softmax           #
         # classifier loss.                                                          #
         #######################################################################
+        
+        scores = scores - np.amax(scores, axis=1)
         score_exp = np.exp(scores)
         score_exp_sum = np.sum(score_exp, axis=1)
         score_true = score_exp[np.arange(N), y]
